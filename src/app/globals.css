@@ -1,26 +1,224 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary nature palette */
+  --forest: #2d5f2d;
+  --forest-light: #4a8c4a;
+  --earth: #8b6f47;
+  --earth-light: #c4a97d;
+  --sky: #5ba3d9;
+  --sky-light: #a8d4f5;
+  --gold: #e8a838;
+  --gold-light: #f5d590;
+
+  /* Feedback colors */
+  --correct: #4ade80;
+  --correct-bg: rgba(74, 222, 128, 0.15);
+  --incorrect: #f87171;
+  --incorrect-bg: rgba(248, 113, 113, 0.15);
+
+  /* Surfaces */
+  --bg: #f7f3ed;
+  --bg-card: #ffffff;
+  --bg-surface: #ede8df;
+  --text: #2c1810;
+  --text-dim: #7a6b5a;
+  --text-light: #a89580;
+
+  /* Module accent colors */
+  --m01: #4ade80;
+  --m02: #60a5fa;
+  --m03: #f59e0b;
+  --m04: #ef4444;
+  --m05: #a855f7;
+  --m06: #14b8a6;
+  --m07: #ec4899;
+  --m08: #84cc16;
+  --m09: #f97316;
+  --m10: #eab308;
+
+  /* Active module accent — set dynamically per module */
+  --module-accent: var(--forest-light);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-card: var(--bg-card);
+  --color-surface: var(--bg-surface);
+  --color-dim: var(--text-dim);
+  --color-correct: var(--correct);
+  --color-incorrect: var(--incorrect);
+  --color-accent: var(--module-accent);
+  --color-forest: var(--forest);
+  --color-forest-light: var(--forest-light);
+  --color-earth: var(--earth);
+  --color-earth-light: var(--earth-light);
+  --color-sky: var(--sky);
+  --color-sky-light: var(--sky-light);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Safe areas for iPad */
+body {
+  background: var(--bg);
+  color: var(--text);
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* === ANIMATIONS === */
+
+/* Correct answer pop */
+@keyframes correct-pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  50% { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Wrong answer shake */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+/* Card slide into place */
+@keyframes slide-in {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Scale in from center */
+@keyframes scale-in {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Bounce in */
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.08); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Float up and fade */
+@keyframes float-up {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-40px); opacity: 0; }
+}
+
+/* Particle burst */
+@keyframes particle-burst {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--px, 50px), var(--py, -50px)) scale(0);
+    opacity: 0;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Pulse glow for active items */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(74, 222, 128, 0); }
 }
+
+/* Gentle bob for scene items */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Stagger children */
+@keyframes stagger-in {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* === UTILITY CLASSES === */
+
+.animate-correct { animation: correct-pop 0.4s ease-out forwards; }
+.animate-shake { animation: shake 0.4s ease-out; }
+.animate-slide-in { animation: slide-in 0.3s ease-out forwards; }
+.animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+.animate-scale-in { animation: scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.animate-bounce-in { animation: bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.animate-float-up { animation: float-up 0.8s ease-out forwards; }
+.animate-pulse-glow { animation: pulse-glow 1.5s ease-in-out infinite; }
+.animate-bob { animation: bob 2s ease-in-out infinite; }
+
+.stagger-children > * {
+  animation: stagger-in 0.3s ease-out forwards;
+  opacity: 0;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 420ms; }
+.stagger-children > *:nth-child(9) { animation-delay: 480ms; }
+.stagger-children > *:nth-child(10) { animation-delay: 540ms; }
+
+/* Touch-friendly interaction states */
+.touch-target {
+  min-height: 48px;
+  min-width: 48px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.touch-target:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
+}
+
+/* Card base style */
+.eco-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(44, 24, 16, 0.08), 0 1px 3px rgba(44, 24, 16, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.eco-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(44, 24, 16, 0.1);
+}
+
+/* Correct/incorrect card states */
+.eco-card-correct {
+  background: var(--correct-bg);
+  border: 2px solid var(--correct);
+}
+
+.eco-card-incorrect {
+  background: var(--incorrect-bg);
+  border: 2px solid var(--incorrect);
+}
+
+/* SVG food web styles */
+.web-node { cursor: pointer; }
+.web-node:hover circle { stroke-width: 3; }
+.web-edge { transition: opacity 0.3s ease, stroke 0.3s ease; }
+.web-dimmed { opacity: 0.15; transition: opacity 0.3s ease; }
+.web-highlighted-eats { stroke: var(--correct); stroke-width: 2.5; }
+.web-highlighted-eaten { stroke: var(--incorrect); stroke-width: 2.5; }

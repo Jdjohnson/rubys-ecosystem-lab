@@ -1,65 +1,126 @@
-import Image from "next/image";
+'use client';
+
+import Link from 'next/link';
+import { modules } from '@/data/modules';
+import { useProgress } from '@/hooks/useProgress';
 
 export default function Home() {
+  const { loaded, isUnlocked, isCompleted, completedModules, totalStars } = useProgress();
+
+  if (!loaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-2xl animate-bob">🌿</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="min-h-screen px-6 py-8 max-w-2xl mx-auto">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="text-5xl mb-3">🌲🦅🐟</div>
+        <h1
+          className="text-3xl font-bold text-foreground mb-1"
+          style={{ fontFamily: 'var(--font-fredoka)' }}
+        >
+          Ruby&apos;s Ozarks Ecosystem Lab
+        </h1>
+        <p className="text-base text-dim">
+          Explore the living and nonliving world around Springfield
+        </p>
+        {totalStars > 0 && (
+          <div className="mt-3 inline-flex items-center gap-1 px-3 py-1 bg-gold-light/30 rounded-full text-sm font-semibold">
+            ⭐ {totalStars} star{totalStars !== 1 ? 's' : ''} earned
+          </div>
+        )}
+      </div>
+
+      {/* Module grid */}
+      <div className="space-y-3 stagger-children">
+        {modules.map((mod) => {
+          const unlocked = isUnlocked(mod.slug);
+          const completed = isCompleted(mod.slug);
+
+          return (
+            <div key={mod.slug}>
+              {unlocked ? (
+                <Link
+                  href={`/module/${mod.slug}`}
+                  className={`
+                    eco-card flex items-center gap-4 p-4 transition-all duration-200
+                    ${completed ? 'opacity-80' : ''}
+                    active:scale-98
+                  `}
+                  style={{
+                    borderLeft: `4px solid ${mod.color}`,
+                  }}
+                >
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                    style={{ backgroundColor: `${mod.color}20` }}
+                  >
+                    {completed ? '✓' : mod.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-dim">
+                        {mod.number}.
+                      </span>
+                      <h2 className="text-base font-bold truncate">{mod.title}</h2>
+                    </div>
+                    <p className="text-sm text-dim truncate">{mod.subtitle}</p>
+                  </div>
+                  <div className="text-dim text-lg flex-shrink-0">
+                    {completed ? (
+                      <span className="text-correct font-bold">⭐</span>
+                    ) : (
+                      '→'
+                    )}
+                  </div>
+                </Link>
+              ) : (
+                <div
+                  className="eco-card flex items-center gap-4 p-4 opacity-40"
+                  style={{ borderLeft: '4px solid #d4c9b8' }}
+                >
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 bg-surface">
+                    🔒
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-dim">
+                        {mod.number}.
+                      </span>
+                      <h2 className="text-base font-bold truncate">{mod.title}</h2>
+                    </div>
+                    <p className="text-sm text-dim">
+                      Complete Module {mod.number - 1} to unlock
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Quick quiz link */}
+      {completedModules.length > 0 && (
+        <div className="mt-6 text-center">
+          <Link
+            href="/quiz"
+            className="touch-target inline-flex items-center gap-2 px-6 py-3 bg-surface rounded-2xl font-semibold text-dim active:scale-95 transition-transform"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            📝 Quick Quiz
+          </Link>
         </div>
-      </main>
-    </div>
+      )}
+
+      {/* Footer */}
+      <div className="mt-8 text-center text-xs text-dim/50">
+        Made for Ruby 🌿 Springfield, MO
+      </div>
+    </main>
   );
 }
