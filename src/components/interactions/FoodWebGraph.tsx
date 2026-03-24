@@ -115,6 +115,13 @@ export function FoodWebGraph({ instructions, onComplete }: FoodWebGraphProps) {
                   cursor: 'pointer',
                 }}
               >
+                {/* Invisible touch target - minimum 48px equivalent in SVG space */}
+                <circle
+                  cx={node.x}
+                  cy={node.y}
+                  r={Math.max(node.radius, 24)}
+                  fill="transparent"
+                />
                 {/* Outer ring for selected */}
                 {isSelected && (
                   <circle
@@ -164,6 +171,7 @@ export function FoodWebGraph({ instructions, onComplete }: FoodWebGraphProps) {
               { color: '#60a5fa', label: 'Prey / Herbivore' },
               { color: '#ef4444', label: 'Predator' },
               { color: '#a855f7', label: 'Omnivore' },
+              { color: '#f97316', label: 'Scavenger' },
               { color: '#8b6f47', label: 'Decomposer' },
             ].map((item, i) => (
               <g key={item.label} transform={`translate(0, ${i * 22})`}>
@@ -187,7 +195,7 @@ export function FoodWebGraph({ instructions, onComplete }: FoodWebGraphProps) {
                 {selectedOrganism.roles.join(' · ')}
               </div>
               <div className="text-sm mt-1">{selectedOrganism.funFact}</div>
-              <div className="flex gap-4 mt-2 text-xs text-dim">
+              <div className="flex flex-col gap-1 mt-2 text-xs text-dim">
                 {connections && connections.eats.length > 0 && (
                   <span className="text-correct">
                     Eats: {connections.eats.map(id => getOrganism(id)?.name || id).join(', ')}
@@ -196,6 +204,11 @@ export function FoodWebGraph({ instructions, onComplete }: FoodWebGraphProps) {
                 {connections && connections.eatenBy.length > 0 && (
                   <span className="text-incorrect">
                     Eaten by: {connections.eatenBy.map(id => getOrganism(id)?.name || id).join(', ')}
+                  </span>
+                )}
+                {connections && connections.eats.length === 0 && connections.eatenBy.length === 0 && (
+                  <span className="italic">
+                    This organism has special feeding relationships not shown in this simplified web.
                   </span>
                 )}
               </div>

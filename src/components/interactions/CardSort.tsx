@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { shuffle } from '@/lib/shuffle';
-import { FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
+import { FeedbackMessage, FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
 import { Button } from '@/components/ui/Button';
 
 interface SortCardData {
@@ -28,6 +28,7 @@ export function CardSort({ instructions, categories, cards, onComplete }: CardSo
     return bins;
   });
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'incorrect'; message?: string } | null>(null);
+  const [overlayType, setOverlayType] = useState<'correct' | 'incorrect' | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
 
   const currentCard = currentIndex < shuffledCards.length ? shuffledCards[currentIndex] : null;
@@ -42,13 +43,15 @@ export function CardSort({ instructions, categories, cards, onComplete }: CardSo
         [category]: [...prev[category], currentCard],
       }));
       setCorrectCount(prev => prev + 1);
-      setFeedback({ type: 'correct' });
+      setFeedback({ type: 'correct', message: `${currentCard.label} fits in ${category}.` });
+      setOverlayType('correct');
       setCurrentIndex(prev => prev + 1);
     } else {
       setFeedback({
         type: 'incorrect',
-        message: currentCard.hint || `${currentCard.label} belongs in ${currentCard.category}.`,
+        message: currentCard.hint || 'Think carefully about this one. What group does it fit best?',
       });
+      setOverlayType('incorrect');
     }
   }, [currentCard]);
 
@@ -73,6 +76,14 @@ export function CardSort({ instructions, categories, cards, onComplete }: CardSo
                 Card {currentIndex + 1} of {shuffledCards.length}
               </div>
             </div>
+
+            {feedback && (
+              <FeedbackMessage
+                type={feedback.type}
+                message={feedback.message}
+                className="mb-4"
+              />
+            )}
 
             {/* Category buttons */}
             <div className={`grid gap-3 ${categories.length <= 2 ? 'grid-cols-2' : categories.length <= 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3'}`}>
@@ -112,9 +123,8 @@ export function CardSort({ instructions, categories, cards, onComplete }: CardSo
       )}
 
       <FeedbackOverlay
-        type={feedback?.type ?? null}
-        message={feedback?.message}
-        onDone={() => setFeedback(null)}
+        type={overlayType}
+        onDone={() => setOverlayType(null)}
       />
     </div>
   );

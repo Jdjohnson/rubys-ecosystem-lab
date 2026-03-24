@@ -59,16 +59,22 @@ export function HabitatExplorer({ instructions, onComplete }: HabitatExplorerPro
         {/* Habitat description */}
         <p className="text-sm text-dim mb-4">{habitat.description}</p>
 
-        {/* Biotic section */}
+        {/* Items to explore - mixed together without revealing classification */}
         <div className="mb-4">
-          <h3 className="text-xs font-bold text-correct uppercase tracking-wide mb-2">
-            🌱 Biotic (Living)
+          <h3 className="text-xs font-bold text-dim uppercase tracking-wide mb-2">
+            Things to Explore
           </h3>
+          <div className="text-xs text-dim mb-3">
+            Tap {6 - explored.size > 0 ? `${6 - explored.size} more` : 'any'} to continue ({explored.size}/6 explored)
+          </div>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-            {habitat.biotic.map((id) => {
+            {[...habitat.biotic, ...habitat.abiotic].map((id) => {
               const org = getOrganism(id);
-              if (!org) return null;
+              const factor = getAbioticFactor(id);
+              const data = org || factor;
+              if (!data) return null;
               const isSelected = selectedItem === id;
+              const isExplored = explored.has(id);
               return (
                 <button
                   key={id}
@@ -77,44 +83,13 @@ export function HabitatExplorer({ instructions, onComplete }: HabitatExplorerPro
                     touch-target eco-card p-2 text-center text-xs font-semibold
                     transition-all duration-200
                     ${isSelected ? 'ring-2 ring-sky scale-105 shadow-md' : 'active:scale-95'}
+                    ${isExplored && !isSelected ? 'opacity-70' : ''}
                   `}
                 >
                   <div className="text-lg mb-0.5">
-                    {org.roles.includes('predator') ? '🔴' :
-                     org.roles.includes('producer') ? '🟢' :
-                     org.roles.includes('decomposer') ? '🟤' :
-                     org.roles.includes('scavenger') ? '🟠' :
-                     org.roles.includes('omnivore') ? '🟣' : '🔵'}
+                    {isExplored ? '✓' : '?'}
                   </div>
-                  {org.name.split(' ').slice(-1)[0]}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Abiotic section */}
-        <div className="mb-4">
-          <h3 className="text-xs font-bold text-sky uppercase tracking-wide mb-2">
-            💎 Abiotic (Nonliving)
-          </h3>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-            {habitat.abiotic.map((id) => {
-              const factor = getAbioticFactor(id);
-              if (!factor) return null;
-              const isSelected = selectedItem === id;
-              return (
-                <button
-                  key={id}
-                  onClick={() => handleItemTap(id)}
-                  className={`
-                    touch-target eco-card p-2 text-center text-xs font-semibold
-                    transition-all duration-200
-                    ${isSelected ? 'ring-2 ring-sky scale-105 shadow-md' : 'active:scale-95'}
-                  `}
-                >
-                  <div className="text-lg mb-0.5">⚪</div>
-                  {factor.name}
+                  {data.name.split(' ').slice(-1)[0]}
                 </button>
               );
             })}

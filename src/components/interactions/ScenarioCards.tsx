@@ -13,16 +13,16 @@ interface ScenarioCardsProps {
 export function ScenarioCards({ instructions, onComplete }: ScenarioCardsProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const [viewedCount, setViewedCount] = useState(0);
+  const [viewedScenarios, setViewedScenarios] = useState<Set<number>>(new Set());
 
   const scenario = scenarios[currentIndex];
   const isLastScenario = currentIndex >= scenarios.length - 1;
-  const viewedEnough = viewedCount >= 3;
+  const viewedEnough = viewedScenarios.size >= 3;
 
   const handleReveal = useCallback(() => {
     setRevealed(true);
-    setViewedCount(prev => prev + 1);
-  }, []);
+    setViewedScenarios(prev => new Set(prev).add(currentIndex));
+  }, [currentIndex]);
 
   const handleNext = useCallback(() => {
     if (isLastScenario) {
@@ -38,7 +38,7 @@ export function ScenarioCards({ instructions, onComplete }: ScenarioCardsProps) 
       <div className="px-6 pt-4 pb-2">
         <p className="text-base text-dim">{instructions}</p>
         <div className="text-sm text-dim mt-1">
-          Scenario {currentIndex + 1} of {scenarios.length} · {viewedCount} explored
+          Scenario {currentIndex + 1} of {scenarios.length} · {viewedScenarios.size} unique explored
         </div>
       </div>
 

@@ -1,26 +1,47 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 import type { ProgressState } from '@/lib/types';
 import { DEFAULT_PROGRESS, loadProgress, saveProgress, isModuleUnlocked } from '@/lib/progress';
 import { MODULE_ORDER } from '@/lib/constants';
 
+// Simple external store for hydration tracking
+let isHydrated = false;
+const hydrationListeners = new Set<() => void>();
+function subscribeToHydration(callback: () => void) {
+  hydrationListeners.add(callback);
+  return () => hydrationListeners.delete(callback);
+}
+function getHydrationSnapshot() { return isHydrated; }
+function getServerSnapshot() { return false; }
+
 export function useProgress() {
+  // Track hydration using useSyncExternalStore to avoid setState-in-effect
+  const hydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getHydrationSnapshot,
+    getServerSnapshot
+  );
+
+  // Set hydrated on mount (runs once after first render)
+  const didMount = useRef(false);
+  useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      if (!isHydrated) {
+        isHydrated = true;
+        hydrationListeners.forEach(cb => cb());
+      }
+    }
+  }, []);
+
+  // Load state: default on server, localStorage on client
   const [state, setState] = useState<ProgressState>(() => {
     if (typeof window === 'undefined') return DEFAULT_PROGRESS;
     return loadProgress();
   });
-  const [loaded, setLoaded] = useState(() => typeof window !== 'undefined');
 
-  // Handle SSR hydration
-  useEffect(() => {
-    if (!loaded) {
-      const saved = loadProgress();
-      setState(saved);
-      setLoaded(true);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const loaded = hydrated;
 
   const update = useCallback((next: ProgressState) => {
     setState(next);
@@ -53,6 +74,10 @@ export function useProgress() {
           : [...prev.completedModules, slug],
         totalStars: prev.totalStars + (alreadyCompleted ? 0 : stars),
         currentModule: null,
+        moduleStepIndex: {
+          ...prev.moduleStepIndex,
+          [slug]: 0,
+        },
       };
       saveProgress(next);
       return next;

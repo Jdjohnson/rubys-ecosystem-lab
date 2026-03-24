@@ -1,49 +1,113 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface FeedbackOverlayProps {
   type: 'correct' | 'incorrect' | null;
   message?: string;
   onDone?: () => void;
+  durationMs?: number;
 }
 
-export function FeedbackOverlay({ type, message, onDone }: FeedbackOverlayProps) {
-  const [visible, setVisible] = useState(false);
+interface FeedbackMessageProps {
+  type: 'correct' | 'incorrect';
+  message?: string;
+  title?: string;
+  className?: string;
+}
+
+export function FeedbackMessage({
+  type,
+  message,
+  title,
+  className = '',
+}: FeedbackMessageProps) {
+  return (
+    <div
+      className={`rounded-2xl border px-4 py-3 text-sm shadow-sm ${
+        type === 'correct'
+          ? 'border-correct/40 bg-correct/12 text-foreground'
+          : 'border-incorrect/40 bg-incorrect/12 text-foreground'
+      } ${className}`}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className={`mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+            type === 'correct'
+              ? 'bg-correct text-white'
+              : 'bg-incorrect text-white'
+          }`}
+        >
+          {type === 'correct' ? '✓' : '!'}
+        </div>
+        <div>
+          <div className="font-bold" style={{ fontFamily: 'var(--font-fredoka)' }}>
+            {title ?? (type === 'correct' ? 'Nice work' : 'Try again')}
+          </div>
+          {message && <p className="mt-1 leading-relaxed text-dim">{message}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function FeedbackOverlay({
+  type,
+  message,
+  onDone,
+  durationMs = 1800,
+}: FeedbackOverlayProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onDoneRef = useRef(onDone);
+  const prefersReducedMotion = useReducedMotion();
 
-  // Derive visibility from type prop changes
-  const shouldShow = type !== null;
-
+  // Keep onDone ref up to date
   useEffect(() => {
-    if (shouldShow) {
-      setVisible(true);
-      timerRef.current = setTimeout(() => {
-        setVisible(false);
-        onDone?.();
-      }, 1200);
-    }
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type]);
+    onDoneRef.current = onDone;
+  }, [onDone]);
 
-  if (!visible || !type) return null;
+  // Handle showing and auto-hiding the overlay
+  useEffect(() => {
+    if (type !== null) {
+      // Clear any existing timer when type changes
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      // Set new timer to call onDone
+      timerRef.current = setTimeout(() => {
+        onDoneRef.current?.();
+      }, durationMs);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [type, durationMs]);
+
+  // Don't render if no type
+  if (type === null) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
       <div
-        className={`px-8 py-6 rounded-3xl text-center ${
+        role="status"
+        aria-live="polite"
+        className={`px-8 py-6 rounded-3xl text-center shadow-xl ${
           type === 'correct'
-            ? 'bg-correct/90 text-white animate-bounce-in'
-            : 'bg-incorrect/90 text-white animate-shake'
+            ? 'bg-correct/92 text-white'
+            : 'bg-incorrect/92 text-white'
         }`}
       >
         <div className="text-4xl mb-2">
           {type === 'correct' ? '✓' : '✗'}
         </div>
-        <div className="text-lg font-bold" style={{ fontFamily: 'var(--font-fredoka)' }}>
+        <div
+          className={`text-lg font-bold ${prefersReducedMotion ? '' : type === 'correct' ? 'animate-bounce-in' : 'animate-shake'}`}
+          style={{ fontFamily: 'var(--font-fredoka)' }}
+        >
           {type === 'correct' ? 'Nice!' : 'Not quite'}
         </div>
         {message && (

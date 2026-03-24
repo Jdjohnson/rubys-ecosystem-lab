@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import type { Classification } from '@/lib/types';
-import { FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
+import { FeedbackMessage, FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
 import { Button } from '@/components/ui/Button';
 
 interface TapItem {
@@ -19,10 +19,13 @@ interface TapToClassifyProps {
 
 type ItemState = 'pending' | 'correct' | 'incorrect-flash';
 
+const NEUTRAL_MARKERS = ['🔍', '🧠', '✨', '🪵', '🫧', '🌎'];
+
 export function TapToClassify({ instructions, items, onComplete }: TapToClassifyProps) {
   const [selectedItem, setSelectedItem] = useState<TapItem | null>(null);
   const [itemStates, setItemStates] = useState<Record<string, ItemState>>({});
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'incorrect'; message?: string } | null>(null);
+  const [overlayType, setOverlayType] = useState<'correct' | 'incorrect' | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
 
   const allDone = correctCount === items.length;
@@ -38,13 +41,22 @@ export function TapToClassify({ instructions, items, onComplete }: TapToClassify
     if (classification === selectedItem.answer) {
       setItemStates(prev => ({ ...prev, [selectedItem.id]: 'correct' }));
       setCorrectCount(prev => prev + 1);
-      setFeedback({ type: 'correct' });
+      setFeedback({
+        type: 'correct',
+        message: selectedItem.answer === 'biotic'
+          ? `${selectedItem.label} is biotic because it is living or came from something living.`
+          : `${selectedItem.label} is abiotic because it was never alive.`,
+      });
+      setOverlayType('correct');
     } else {
       setItemStates(prev => ({ ...prev, [selectedItem.id]: 'incorrect-flash' }));
-      const hint = selectedItem.answer === 'biotic'
-        ? `${selectedItem.label} is biotic — it's alive!`
-        : `${selectedItem.label} is abiotic — it was never alive.`;
-      setFeedback({ type: 'incorrect', message: hint });
+      setFeedback({
+        type: 'incorrect',
+        message: selectedItem.answer === 'biotic'
+          ? `Look for signs that ${selectedItem.label.toLowerCase()} is living or came from something living.`
+          : `Think about whether ${selectedItem.label.toLowerCase()} was ever alive.`,
+      });
+      setOverlayType('incorrect');
       // Reset after flash
       setTimeout(() => {
         setItemStates(prev => {
@@ -67,11 +79,14 @@ export function TapToClassify({ instructions, items, onComplete }: TapToClassify
         <div className="mt-2 text-sm text-dim">
           {correctCount} / {items.length} classified
         </div>
+        <div className="mt-1 text-sm text-dim">
+          Nothing is labeled for you first. Use your science brain, then check your answer.
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-4">
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-          {items.map((item) => {
+          {items.map((item, index) => {
             const state = itemStates[item.id];
             const isSelected = selectedItem?.id === item.id;
 
@@ -89,8 +104,8 @@ export function TapToClassify({ instructions, items, onComplete }: TapToClassify
                   ${!state && !isSelected ? 'active:scale-95' : ''}
                 `}
               >
-                <span className="text-3xl">
-                  {state === 'correct' ? '✓' : item.answer === 'biotic' ? '🌿' : '💎'}
+                <span className="text-3xl" aria-hidden="true">
+                  {state === 'correct' ? '✓' : NEUTRAL_MARKERS[index % NEUTRAL_MARKERS.length]}
                 </span>
                 <span className="text-sm font-semibold">{item.label}</span>
                 {state === 'correct' && (
@@ -114,16 +129,26 @@ export function TapToClassify({ instructions, items, onComplete }: TapToClassify
             <button
               onClick={() => handleClassify('biotic')}
               className="touch-target flex-1 py-4 bg-correct/15 border-2 border-correct rounded-2xl text-center font-bold text-lg active:scale-95 transition-transform"
-            >
-              🌱 Biotic
+              >
+                Biotic
             </button>
             <button
               onClick={() => handleClassify('abiotic')}
               className="touch-target flex-1 py-4 bg-sky/15 border-2 border-sky rounded-2xl text-center font-bold text-lg active:scale-95 transition-transform"
-            >
-              💎 Abiotic
-            </button>
+              >
+                Abiotic
+              </button>
+            </div>
           </div>
+      )}
+
+      {feedback && (
+        <div className="px-6 pb-4">
+          <FeedbackMessage
+            type={feedback.type}
+            message={feedback.message}
+            title={feedback.type === 'correct' ? 'You checked it correctly' : 'Try a different clue'}
+          />
         </div>
       )}
 
@@ -137,9 +162,8 @@ export function TapToClassify({ instructions, items, onComplete }: TapToClassify
       )}
 
       <FeedbackOverlay
-        type={feedback?.type ?? null}
-        message={feedback?.message}
-        onDone={() => setFeedback(null)}
+        type={overlayType}
+        onDone={() => setOverlayType(null)}
       />
     </div>
   );
