@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import type { Classification } from '@/lib/types';
 import { FeedbackMessage, FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
 import { Button } from '@/components/ui/Button';
+import { ItemImage } from '@/components/ui/ItemImage';
 
 interface TapItem {
   id: string;
@@ -18,8 +19,6 @@ interface TapToClassifyProps {
 }
 
 type ItemState = 'pending' | 'correct' | 'incorrect-flash';
-
-const NEUTRAL_MARKERS = ['🔍', '🧠', '✨', '🪵', '🫧', '🌎'];
 
 export function TapToClassify({ instructions, items, onComplete }: TapToClassifyProps) {
   const [selectedItem, setSelectedItem] = useState<TapItem | null>(null);
@@ -104,9 +103,11 @@ export function TapToClassify({ instructions, items, onComplete }: TapToClassify
                   ${!state && !isSelected ? 'active:scale-95' : ''}
                 `}
               >
-                <span className="text-3xl" aria-hidden="true">
-                  {state === 'correct' ? '✓' : NEUTRAL_MARKERS[index % NEUTRAL_MARKERS.length]}
-                </span>
+                {state === 'correct' ? (
+                  <span className="text-3xl text-correct" aria-hidden="true">✓</span>
+                ) : (
+                  <ItemImage id={item.id} name={item.label} size={56} />
+                )}
                 <span className="text-sm font-semibold">{item.label}</span>
                 {state === 'correct' && (
                   <span className="text-xs text-correct font-bold">

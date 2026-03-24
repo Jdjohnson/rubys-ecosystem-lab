@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Image from 'next/image';
 import { habitats } from '@/data/habitats';
 import { getOrganism, getAbioticFactor } from '@/data/organisms';
 import { Button } from '@/components/ui/Button';
+import { ItemImage } from '@/components/ui/ItemImage';
 import type { HabitatType } from '@/lib/types';
 
 interface HabitatExplorerProps {
@@ -57,6 +59,21 @@ export function HabitatExplorer({ instructions, onComplete }: HabitatExplorerPro
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-4">
+        {/* Scene banner */}
+        <div className="relative w-full h-32 rounded-xl overflow-hidden mb-3">
+          <Image
+            src={`/images/scenes/${activeHabitat}.webp`}
+            alt={habitat.name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 600px"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+          <div className="absolute bottom-2 left-3 text-white text-sm font-bold drop-shadow-md" style={{ fontFamily: 'var(--font-fredoka)' }}>
+            {habitat.name}
+          </div>
+        </div>
+
         {/* Habitat description */}
         <p className="text-sm text-dim mb-4">{habitat.description}</p>
 
@@ -85,14 +102,12 @@ export function HabitatExplorer({ instructions, onComplete }: HabitatExplorerPro
                   onClick={() => handleItemTap(id)}
                   className={`
                     touch-target eco-card p-2 text-center text-xs font-semibold
-                    transition-all duration-200
+                    transition-all duration-200 flex flex-col items-center gap-1
                     ${isSelected ? 'ring-2 ring-sky scale-105 shadow-md' : 'active:scale-95'}
                     ${isExplored && !isSelected ? 'opacity-70' : ''}
                   `}
                 >
-                  <div className="text-lg mb-0.5">
-                    {isExplored ? '✓' : '?'}
-                  </div>
+                  <ItemImage id={id} name={data.name} size={40} fallbackEmoji="?" />
                   {data.name.length > 12 ? data.name.split(' ')[0] : data.name}
                 </button>
               );
@@ -104,6 +119,9 @@ export function HabitatExplorer({ instructions, onComplete }: HabitatExplorerPro
       {/* Detail panel */}
       {selectedData && (
         <div className="px-6 py-3 border-t border-surface animate-slide-in bg-card">
+          <div className="flex items-start gap-3">
+            <ItemImage id={selectedItem!} name={selectedData.name} size={56} className="flex-shrink-0" />
+            <div className="flex-1 min-w-0">
           <div className="font-bold text-base" style={{ fontFamily: 'var(--font-fredoka)' }}>
             {selectedData.name}
           </div>
@@ -118,6 +136,8 @@ export function HabitatExplorer({ instructions, onComplete }: HabitatExplorerPro
           {'description' in selectedData && (
             <p className="text-sm">{selectedData.description}</p>
           )}
+            </div>
+          </div>
         </div>
       )}
 

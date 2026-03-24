@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { webNodes, webEdges, getConnections } from '@/data/food-web';
 import { getOrganism } from '@/data/organisms';
 import { Button } from '@/components/ui/Button';
+import { ItemImage } from '@/components/ui/ItemImage';
 
 interface FoodWebGraphProps {
   instructions: string;
@@ -188,6 +189,7 @@ export function FoodWebGraph({ instructions, onComplete }: FoodWebGraphProps) {
       {selectedOrganism && (
         <div className="px-6 py-3 border-t border-surface animate-slide-in bg-card">
           <div className="flex items-start gap-3">
+            <ItemImage id={selectedId!} name={selectedOrganism.name} size={56} className="flex-shrink-0" />
             <div className="flex-1">
               <div className="font-bold text-lg" style={{ fontFamily: 'var(--font-fredoka)' }}>
                 {selectedOrganism.name}

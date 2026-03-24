@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { shuffle } from '@/lib/shuffle';
 import { FeedbackMessage, FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
 import { Button } from '@/components/ui/Button';
+import { ItemImage } from '@/components/ui/ItemImage';
 
 interface MatchPair {
   organismId: string;
@@ -92,6 +93,7 @@ export function MatchingGame({ instructions, pairs, onComplete }: MatchingGamePr
                     ${!isMatched && !isSelected ? 'active:scale-95' : ''}
                   `}
                 >
+                  <ItemImage id={pair.organismId} name={pair.organismLabel} size={32} className="mx-auto mb-1" />
                   {pair.organismLabel}
                   {isMatched && <span className="ml-1 text-correct">✓</span>}
                 </button>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { modules } from '@/data/modules';
@@ -34,18 +35,32 @@ export default function Home() {
 
   return (
     <main className="min-h-dvh px-6 py-8 max-w-2xl mx-auto">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="text-5xl mb-3">🌲🦅🐟</div>
-        <h1
-          className="text-3xl font-bold text-foreground mb-1"
-          style={{ fontFamily: 'var(--font-fredoka)' }}
-        >
-          Ruby&apos;s Ozarks Ecosystem Lab
-        </h1>
-        <p className="text-base text-dim">
-          Explore the living and nonliving world around Springfield
-        </p>
+      {/* Hero banner */}
+      <div className="relative w-full h-44 rounded-2xl overflow-hidden mb-6">
+        <Image
+          src="/images/scenes/hero.webp"
+          alt="Ozarks ecosystem panorama"
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 600px"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+        <div className="absolute bottom-3 left-4 right-4 text-white">
+          <h1
+            className="text-2xl font-bold drop-shadow-md"
+            style={{ fontFamily: 'var(--font-fredoka)' }}
+          >
+            Ruby&apos;s Ozarks Ecosystem Lab
+          </h1>
+          <p className="text-sm opacity-90 drop-shadow-sm">
+            Explore the living and nonliving world around Springfield
+          </p>
+        </div>
+      </div>
+
+      {/* Header extras */}
+      <div className="text-center mb-6">
         {totalStars > 0 && (
           <div className="mt-3 inline-flex items-center gap-1 px-3 py-1 bg-gold-light/30 rounded-full text-sm font-semibold">
             ⭐ {totalStars} star{totalStars !== 1 ? 's' : ''} earned

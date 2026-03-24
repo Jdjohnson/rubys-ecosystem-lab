@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { shuffle } from '@/lib/shuffle';
 import { FeedbackMessage, FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
 import { Button } from '@/components/ui/Button';
+import { ItemImage } from '@/components/ui/ItemImage';
 
 interface ChainCardData {
   id: string;
@@ -154,8 +155,8 @@ export function DragToOrder({ instructions, chains, onComplete }: DragToOrderPro
                 >
                   {slot ? (
                     <>
+                      <ItemImage id={slot.id} name={slot.label} size={32} className="mb-0.5" />
                       <span className="font-bold text-xs">{slot.label}</span>
-                      <span className="text-[10px] text-dim mt-0.5">{slot.role}</span>
                     </>
                   ) : (
                     <span className="text-dim">?</span>
@@ -182,6 +183,7 @@ export function DragToOrder({ instructions, chains, onComplete }: DragToOrderPro
                     ${selectedCard?.id === card.id ? 'ring-3 ring-sky scale-105 shadow-lg' : 'active:scale-95'}
                   `}
                 >
+                  <ItemImage id={card.id} name={card.label} size={40} className="mx-auto mb-1" />
                   <div className="text-sm font-bold">{card.label}</div>
                 </button>
               ))}

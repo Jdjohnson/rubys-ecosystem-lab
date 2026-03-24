@@ -4,12 +4,14 @@ import { useState, useCallback, useMemo } from 'react';
 import { shuffle } from '@/lib/shuffle';
 import { FeedbackMessage, FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
 import { Button } from '@/components/ui/Button';
+import { ItemImage } from '@/components/ui/ItemImage';
 
 interface SortCardData {
   id: string;
   label: string;
   category: string;
   hint?: string;
+  imageId?: string;
 }
 
 interface CardSortProps {
@@ -68,7 +70,10 @@ export function CardSort({ instructions, categories, cards, onComplete }: CardSo
         {currentCard ? (
           <div className="w-full max-w-sm">
             {/* Current card */}
-            <div className="eco-card p-6 text-center mb-6 animate-slide-in" key={currentCard.id}>
+            <div className="eco-card p-6 text-center mb-6 animate-slide-in flex flex-col items-center" key={currentCard.id}>
+              {currentCard.imageId && (
+                <ItemImage id={currentCard.imageId} name={currentCard.label} size={72} className="mb-2" />
+              )}
               <div className="text-2xl font-bold mb-1" style={{ fontFamily: 'var(--font-fredoka)' }}>
                 {currentCard.label}
               </div>

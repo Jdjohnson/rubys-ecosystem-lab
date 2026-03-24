@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { scenarios } from '@/data/scenarios';
 import { getOrganism } from '@/data/organisms';
 import { Button } from '@/components/ui/Button';
+import { ItemImage } from '@/components/ui/ItemImage';
 
 interface ScenarioCardsProps {
   instructions: string;
@@ -79,8 +80,9 @@ export function ScenarioCards({ instructions, onComplete }: ScenarioCardsProps) 
                         className="flex items-start gap-3 animate-slide-in"
                         style={{ animationDelay: `${i * 100}ms` }}
                       >
+                        <ItemImage id={effect.organism} name={org?.name || effect.organism} size={36} className="flex-shrink-0" />
                         <div className={`
-                          w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0
+                          w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 -ml-3 mt-5
                           ${effect.direction === 'increase'
                             ? 'bg-correct/20 text-correct'
                             : effect.direction === 'decrease'
