@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { quizBank } from '@/data/quiz-bank';
-import { FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
+import { FeedbackMessage, FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
 import { Button } from '@/components/ui/Button';
 
 interface QuizQuestionProps {
@@ -18,6 +18,7 @@ export function QuizQuestion({ questionIds, showScore = false, onComplete }: Qui
   const [answered, setAnswered] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'incorrect'; message?: string } | null>(null);
+  const [overlayType, setOverlayType] = useState<'correct' | 'incorrect' | null>(null);
 
   const question = questions[currentIndex];
   const allDone = currentIndex >= questions.length;
@@ -31,9 +32,11 @@ export function QuizQuestion({ questionIds, showScore = false, onComplete }: Qui
     const isCorrect = question.options[optionIndex].correct;
     if (isCorrect) {
       setCorrectCount(prev => prev + 1);
-      setFeedback({ type: 'correct' });
+      setFeedback({ type: 'correct', message: question.explanation });
+      setOverlayType('correct');
     } else {
-      setFeedback({ type: 'incorrect' });
+      setFeedback({ type: 'incorrect', message: question.explanation });
+      setOverlayType('incorrect');
     }
   }, [answered, question]);
 
@@ -41,6 +44,7 @@ export function QuizQuestion({ questionIds, showScore = false, onComplete }: Qui
     setCurrentIndex(prev => prev + 1);
     setSelectedOption(null);
     setAnswered(false);
+    setFeedback(null);
   }, []);
 
   if (allDone) {
@@ -141,9 +145,13 @@ export function QuizQuestion({ questionIds, showScore = false, onComplete }: Qui
           </div>
 
           {/* Explanation */}
-          {answered && (
-            <div className="mt-4 p-4 bg-gold-light/20 rounded-xl animate-slide-in">
-              <p className="text-sm">{question.explanation}</p>
+          {answered && feedback && (
+            <div className="mt-4 animate-slide-in">
+              <FeedbackMessage
+                type={feedback.type}
+                title={feedback.type === 'correct' ? 'You got it' : 'Let’s fix it'}
+                message={feedback.message}
+              />
             </div>
           )}
         </div>
@@ -158,8 +166,8 @@ export function QuizQuestion({ questionIds, showScore = false, onComplete }: Qui
       )}
 
       <FeedbackOverlay
-        type={feedback?.type ?? null}
-        onDone={() => setFeedback(null)}
+        type={overlayType}
+        onDone={() => setOverlayType(null)}
       />
     </div>
   );

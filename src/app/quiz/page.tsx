@@ -3,20 +3,42 @@
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import { quizBank } from '@/data/quiz-bank';
+import { modules } from '@/data/modules';
 import { shuffle } from '@/lib/shuffle';
 import { QuizQuestion } from '@/components/interactions/QuizQuestion';
+import { useProgress } from '@/hooks/useProgress';
 
 export default function QuizPage() {
   const router = useRouter();
+  const { completedModules, loaded } = useProgress();
 
-  // Grab 10 random questions from the full bank
+  // Only include questions from completed modules
   const questionIds = useMemo(() => {
-    const shuffled = shuffle(quizBank);
-    return shuffled.slice(0, 10).map(q => q.id);
-  }, []);
+    // Map module slugs to the module numbers (1-indexed)
+    const completedSlugs = new Set(completedModules);
+    // Also include questions from the first module's topic if it's completed
+    const eligibleModules = new Set<string>();
+    modules.forEach(m => {
+      if (completedSlugs.has(m.slug)) {
+        eligibleModules.add(m.slug);
+      }
+    });
+
+    const eligibleQuestions = quizBank.filter(q => eligibleModules.has(q.module));
+    const shuffled = shuffle(eligibleQuestions);
+    return shuffled.slice(0, Math.min(10, shuffled.length)).map(q => q.id);
+  }, [completedModules]);
+
+  if (!loaded) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <div className="text-2xl animate-bob">📝</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-dvh flex flex-col">
       <header className="px-6 pt-4 pb-3 flex items-center gap-3">
         <button
           onClick={() => router.push('/')}

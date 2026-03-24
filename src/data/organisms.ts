@@ -53,7 +53,7 @@ export const organisms: Organism[] = [
     habitats: ['pond-creek'],
     needs: ['sunlight', 'water', 'nutrients from mud'],
     eats: [],
-    eatenBy: ['muskrat'],
+    eatenBy: ['eastern-cottontail'],
     funFact: 'Every part of a cattail is useful. Native Americans used them for food, shelter, and medicine.',
   },
   {
@@ -303,7 +303,7 @@ export const organisms: Organism[] = [
     needs: ['water', 'food', 'shelter'],
     eats: ['crayfish', 'minnow'],
     eatenBy: ['coyote'],
-    funFact: 'Raccoons wash their food in water before eating it. Their name comes from a word meaning "one who scrubs."',
+    funFact: 'Raccoons feel their food with their sensitive paws, often in water because it heightens their sense of touch.',
   },
   {
     id: 'box-turtle',

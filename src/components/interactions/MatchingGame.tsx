@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { shuffle } from '@/lib/shuffle';
-import { FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
+import { FeedbackMessage, FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
 import { Button } from '@/components/ui/Button';
 
 interface MatchPair {
@@ -10,6 +10,8 @@ interface MatchPair {
   organismLabel: string;
   needId: string;
   needLabel: string;
+  hint?: string;
+  successMessage?: string;
 }
 
 interface MatchingGameProps {
@@ -23,6 +25,7 @@ export function MatchingGame({ instructions, pairs, onComplete }: MatchingGamePr
   const [selectedOrganism, setSelectedOrganism] = useState<string | null>(null);
   const [matches, setMatches] = useState<Record<string, string>>({}); // organismId -> needId
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'incorrect'; message?: string } | null>(null);
+  const [overlayType, setOverlayType] = useState<'correct' | 'incorrect' | null>(null);
 
   const matchedOrganisms = useMemo(() => new Set(Object.keys(matches)), [matches]);
   const matchedNeeds = useMemo(() => new Set(Object.values(matches)), [matches]);
@@ -39,9 +42,17 @@ export function MatchingGame({ instructions, pairs, onComplete }: MatchingGamePr
     const pair = pairs.find(p => p.organismId === selectedOrganism);
     if (pair && pair.needId === needId) {
       setMatches(prev => ({ ...prev, [selectedOrganism]: needId }));
-      setFeedback({ type: 'correct' });
+      setFeedback({
+        type: 'correct',
+        message: pair.successMessage || `${pair.organismLabel} depends on ${pair.needLabel}.`,
+      });
+      setOverlayType('correct');
     } else {
-      setFeedback({ type: 'incorrect', message: 'Try a different match.' });
+      setFeedback({
+        type: 'incorrect',
+        message: pair?.hint || 'Try a different match. Think about the abiotic condition that matters most here.',
+      });
+      setOverlayType('incorrect');
     }
     setSelectedOrganism(null);
   }, [selectedOrganism, matchedNeeds, pairs]);
@@ -52,6 +63,9 @@ export function MatchingGame({ instructions, pairs, onComplete }: MatchingGamePr
         <p className="text-base text-dim">{instructions}</p>
         <div className="mt-2 text-sm text-dim">
           {Object.keys(matches).length} / {pairs.length} matched
+        </div>
+        <div className="mt-1 text-sm text-dim">
+          Match each organism to the abiotic condition that best explains where it can live.
         </div>
       </div>
 
@@ -112,6 +126,12 @@ export function MatchingGame({ instructions, pairs, onComplete }: MatchingGamePr
             })}
           </div>
         </div>
+
+        {feedback && (
+          <div className="mx-auto mt-4 max-w-lg">
+            <FeedbackMessage type={feedback.type} message={feedback.message} />
+          </div>
+        )}
       </div>
 
       {allDone && (
@@ -123,9 +143,8 @@ export function MatchingGame({ instructions, pairs, onComplete }: MatchingGamePr
       )}
 
       <FeedbackOverlay
-        type={feedback?.type ?? null}
-        message={feedback?.message}
-        onDone={() => setFeedback(null)}
+        type={overlayType}
+        onDone={() => setOverlayType(null)}
       />
     </div>
   );

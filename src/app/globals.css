@@ -70,7 +70,6 @@ body {
   padding-left: env(safe-area-inset-left);
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  user-select: none;
 }
 
 /* === ANIMATIONS === */
@@ -184,6 +183,7 @@ body {
   min-width: 48px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .touch-target:active {
@@ -222,3 +222,12 @@ body {
 .web-dimmed { opacity: 0.15; transition: opacity 0.3s ease; }
 .web-highlighted-eats { stroke: var(--correct); stroke-width: 2.5; }
 .web-highlighted-eaten { stroke: var(--incorrect); stroke-width: 2.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

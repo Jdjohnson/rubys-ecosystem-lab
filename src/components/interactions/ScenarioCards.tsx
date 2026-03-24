@@ -17,7 +17,7 @@ export function ScenarioCards({ instructions, onComplete }: ScenarioCardsProps) 
 
   const scenario = scenarios[currentIndex];
   const isLastScenario = currentIndex >= scenarios.length - 1;
-  const viewedEnough = viewedScenarios.size >= 3;
+  const viewedEnough = viewedScenarios.size >= scenarios.length;
 
   const handleReveal = useCallback(() => {
     setRevealed(true);

@@ -29,7 +29,7 @@ export function FoodWebGraph({ instructions, onComplete }: FoodWebGraphProps) {
       <div className="px-6 pt-4 pb-2">
         <p className="text-base text-dim">{instructions}</p>
         <div className="text-sm text-dim mt-1">
-          {explored.size} organisms explored
+          Tap to explore · {explored.size}/5 to continue
         </div>
       </div>
 
@@ -37,7 +37,7 @@ export function FoodWebGraph({ instructions, onComplete }: FoodWebGraphProps) {
         <svg
           viewBox="0 0 1000 800"
           className="w-full h-full"
-          style={{ maxHeight: 'calc(100vh - 320px)' }}
+          style={{ maxHeight: 'calc(100dvh - 320px)' }}
         >
           {/* Edges */}
           {webEdges.map((edge, i) => {
@@ -164,22 +164,23 @@ export function FoodWebGraph({ instructions, onComplete }: FoodWebGraphProps) {
             );
           })}
 
-          {/* Legend */}
-          <g transform="translate(30, 30)">
-            {[
-              { color: '#4a8c4a', label: 'Producer' },
-              { color: '#60a5fa', label: 'Prey / Herbivore' },
-              { color: '#ef4444', label: 'Predator' },
-              { color: '#a855f7', label: 'Omnivore' },
-              { color: '#f97316', label: 'Scavenger' },
-              { color: '#8b6f47', label: 'Decomposer' },
-            ].map((item, i) => (
-              <g key={item.label} transform={`translate(0, ${i * 22})`}>
-                <circle cx={8} cy={0} r={7} fill={item.color} />
-                <text x={22} y={4} fontSize={11} fill="#7a6b5a">{item.label}</text>
-              </g>
-            ))}
-          </g>
+          {/* Legend - only show after first selection to avoid pre-labeling */}
+          {selectedId && (
+            <g transform="translate(30, 30)" opacity={0.7}>
+              {[
+                { color: '#4a8c4a', label: 'Producer' },
+                { color: '#60a5fa', label: 'Prey' },
+                { color: '#ef4444', label: 'Predator' },
+                { color: '#a855f7', label: 'Omnivore' },
+                { color: '#8b6f47', label: 'Decomposer' },
+              ].map((item, i) => (
+                <g key={item.label} transform={`translate(0, ${i * 18})`}>
+                  <circle cx={6} cy={0} r={5} fill={item.color} />
+                  <text x={16} y={3} fontSize={9} fill="#9a8a7a">{item.label}</text>
+                </g>
+              ))}
+            </g>
+          )}
         </svg>
       </div>
 

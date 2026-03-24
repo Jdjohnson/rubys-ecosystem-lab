@@ -18,8 +18,8 @@ export const scenarios: Scenario[] = [
         direction: 'decrease',
       },
       {
-        organism: 'bullfrog',
-        effect: 'Fewer grasshoppers means less food for bullfrogs. Ponds also shrink.',
+        organism: 'field-mouse',
+        effect: 'Less grass means fewer seeds for mice to eat.',
         direction: 'decrease',
       },
       {
@@ -107,8 +107,8 @@ export const scenarios: Scenario[] = [
         direction: 'decrease',
       },
       {
-        organism: 'copperhead',
-        effect: 'Warmer weather means more active time for cold-blooded snakes.',
+        organism: 'green-darner',
+        effect: 'Warmer weather means more active time for cold-blooded dragonflies.',
         direction: 'increase',
       },
     ],
@@ -125,8 +125,8 @@ export const scenarios: Scenario[] = [
         direction: 'increase',
       },
       {
-        organism: 'cattail',
-        effect: 'Less sunlight reaches underwater plants. Some die off.',
+        organism: 'crayfish',
+        effect: 'Crayfish that graze on bottom algae find less food as light can\'t reach the pond floor.',
         direction: 'decrease',
       },
       {

@@ -19,8 +19,8 @@ export const foodChains: FoodChain[] = [
     id: 'prairie-chain',
     name: 'Prairie Chain',
     habitat: 'field-prairie',
-    // Sun → Big Bluestem Grass → Grasshopper → Bullfrog → Coyote
-    steps: ['big-bluestem', 'grasshopper', 'bullfrog', 'coyote'],
+    // Sun → Big Bluestem Grass → Field Mouse → Copperhead → Red-Tailed Hawk
+    steps: ['big-bluestem', 'field-mouse', 'copperhead', 'red-tailed-hawk'],
   },
 ];
 

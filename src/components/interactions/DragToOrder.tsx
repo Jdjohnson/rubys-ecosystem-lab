@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { shuffle } from '@/lib/shuffle';
-import { FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
+import { FeedbackMessage, FeedbackOverlay } from '@/components/ui/FeedbackOverlay';
 import { Button } from '@/components/ui/Button';
 
 interface ChainCardData {
@@ -35,6 +35,7 @@ export function DragToOrder({ instructions, chains, onComplete }: DragToOrderPro
   const [availableCards, setAvailableCards] = useState<ChainCardData[]>(shuffled);
   const [selectedCard, setSelectedCard] = useState<ChainCardData | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'incorrect'; message?: string } | null>(null);
+  const [overlayType, setOverlayType] = useState<'correct' | 'incorrect' | null>(null);
   const [locked, setLocked] = useState(false);
 
   const allChainsDone = chainIndex >= chains.length;
@@ -63,7 +64,11 @@ export function DragToOrder({ instructions, chains, onComplete }: DragToOrderPro
         return next;
       });
       setAvailableCards(prev => prev.filter(c => c.id !== selectedCard.id));
-      setFeedback({ type: 'correct' });
+      setFeedback({
+        type: 'correct',
+        message: `${selectedCard.label} belongs there. Keep following the energy to the eater.`,
+      });
+      setOverlayType('correct');
       setSelectedCard(null);
 
       // Check if chain is complete
@@ -76,6 +81,7 @@ export function DragToOrder({ instructions, chains, onComplete }: DragToOrderPro
         type: 'incorrect',
         message: `${selectedCard.label} doesn't go here. Think about the order of energy flow.`,
       });
+      setOverlayType('incorrect');
       setSelectedCard(null);
     }
   }, [selectedCard, locked, slots, chain]);
@@ -190,6 +196,12 @@ export function DragToOrder({ instructions, chains, onComplete }: DragToOrderPro
             Energy moves from food to eater.
           </p>
         </div>
+
+        {feedback && (
+          <div className="mt-4">
+            <FeedbackMessage type={feedback.type} message={feedback.message} />
+          </div>
+        )}
       </div>
 
       {locked && (
@@ -205,9 +217,8 @@ export function DragToOrder({ instructions, chains, onComplete }: DragToOrderPro
       )}
 
       <FeedbackOverlay
-        type={feedback?.type ?? null}
-        message={feedback?.message}
-        onDone={() => setFeedback(null)}
+        type={overlayType}
+        onDone={() => setOverlayType(null)}
       />
     </div>
   );

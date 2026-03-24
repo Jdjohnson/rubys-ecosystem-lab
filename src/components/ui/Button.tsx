@@ -20,7 +20,7 @@ export function Button({
   const base = 'touch-target inline-flex items-center justify-center font-semibold rounded-2xl transition-all duration-200';
 
   const variants = {
-    primary: 'bg-forest-light text-white active:bg-forest shadow-md active:shadow-sm',
+    primary: 'bg-accent text-white shadow-md active:opacity-90',
     secondary: 'bg-surface text-foreground border-2 border-earth-light active:bg-earth-light/20',
     ghost: 'text-dim hover:text-foreground active:bg-surface',
   };
@@ -33,6 +33,7 @@ export function Button({
 
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={disabled}
       className={`${base} ${variants[variant]} ${sizes[size]} ${disabled ? 'opacity-40 pointer-events-none' : ''} ${className}`}

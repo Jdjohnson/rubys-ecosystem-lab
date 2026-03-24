@@ -15,9 +15,10 @@ export function HabitatExplorer({ instructions, onComplete }: HabitatExplorerPro
   const [activeHabitat, setActiveHabitat] = useState<HabitatType>('woods');
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [explored, setExplored] = useState<Set<string>>(new Set());
+  const [visitedHabitats, setVisitedHabitats] = useState<Set<HabitatType>>(new Set(['woods']));
 
   const habitat = habitats.find(h => h.id === activeHabitat)!;
-  const exploredEnough = explored.size >= 6;
+  const exploredEnough = explored.size >= 6 && visitedHabitats.size >= 3;
 
   const handleItemTap = useCallback((id: string) => {
     setSelectedItem(prev => prev === id ? null : id);
@@ -39,7 +40,7 @@ export function HabitatExplorer({ instructions, onComplete }: HabitatExplorerPro
         {habitats.map((h) => (
           <button
             key={h.id}
-            onClick={() => { setActiveHabitat(h.id); setSelectedItem(null); }}
+            onClick={() => { setActiveHabitat(h.id); setSelectedItem(null); setVisitedHabitats(prev => new Set(prev).add(h.id)); }}
             className={`
               touch-target flex-1 py-3 px-2 rounded-xl text-center text-sm font-semibold
               transition-all duration-200
@@ -65,7 +66,10 @@ export function HabitatExplorer({ instructions, onComplete }: HabitatExplorerPro
             Things to Explore
           </h3>
           <div className="text-xs text-dim mb-3">
-            Tap {6 - explored.size > 0 ? `${6 - explored.size} more` : 'any'} to continue ({explored.size}/6 explored)
+            {visitedHabitats.size < 3
+              ? `Visit all 3 habitats (${visitedHabitats.size}/3) · ${explored.size}/6 explored`
+              : `Tap ${Math.max(0, 6 - explored.size)} more to continue (${explored.size}/6 explored)`
+            }
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {[...habitat.biotic, ...habitat.abiotic].map((id) => {
@@ -89,7 +93,7 @@ export function HabitatExplorer({ instructions, onComplete }: HabitatExplorerPro
                   <div className="text-lg mb-0.5">
                     {isExplored ? '✓' : '?'}
                   </div>
-                  {data.name.split(' ').slice(-1)[0]}
+                  {data.name.length > 12 ? data.name.split(' ')[0] : data.name}
                 </button>
               );
             })}

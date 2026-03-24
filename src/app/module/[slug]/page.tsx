@@ -10,6 +10,7 @@ import { StepDots } from '@/components/ui/StepDots';
 import { TeachScreen } from '@/components/content/TeachScreen';
 import { ConfettiEffect } from '@/components/effects/ConfettiEffect';
 import { CompletionBadge } from '@/components/effects/CompletionBadge';
+import { Button } from '@/components/ui/Button';
 
 // Interaction components
 import { TapToClassify } from '@/components/interactions/TapToClassify';
@@ -38,7 +39,14 @@ export default function ModulePage() {
   const router = useRouter();
   const slug = params.slug;
   const mod = getModule(slug);
-  const { loaded, getStepIndex, advanceStep, completeModule, isUnlocked } = useProgress();
+  const {
+    loaded,
+    getStepIndex,
+    advanceStep,
+    completeModule,
+    isUnlocked,
+    resetModule,
+  } = useProgress();
   const { particles, active: confettiActive, fire: fireConfetti } = useConfetti();
   const [showCompletion, setShowCompletion] = useState(false);
 
@@ -67,9 +75,14 @@ export default function ModulePage() {
     }
   }, [slug, router]);
 
+  const handleRestart = useCallback(() => {
+    resetModule(slug);
+    setShowCompletion(false);
+  }, [resetModule, slug]);
+
   if (!loaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center">
         <div className="text-2xl animate-bob">🌿</div>
       </div>
     );
@@ -77,7 +90,7 @@ export default function ModulePage() {
 
   if (!mod) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">🤔</div>
           <p className="text-lg font-semibold">Module not found</p>
@@ -94,7 +107,7 @@ export default function ModulePage() {
 
   if (!isUnlocked(slug)) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-6">
+      <div className="min-h-dvh flex items-center justify-center px-6">
         <div className="text-center">
           <div className="text-4xl mb-4">🔒</div>
           <p className="text-lg font-semibold mb-2">This module is locked</p>
@@ -134,7 +147,7 @@ export default function ModulePage() {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
+      className="min-h-dvh flex flex-col"
       style={{ '--module-accent': mod.color } as React.CSSProperties}
     >
       {/* Module header */}
@@ -155,6 +168,11 @@ export default function ModulePage() {
             color={mod.color}
           />
         </div>
+        {stepIndex > 0 && (
+          <Button onClick={handleRestart} variant="secondary" size="sm">
+            Start over
+          </Button>
+        )}
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center text-lg"
           style={{ backgroundColor: `${mod.color}20` }}

@@ -29,7 +29,6 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -43,7 +42,7 @@ export default function RootLayout({
       className={`${nunito.variable} ${fredoka.variable} h-full antialiased`}
     >
       <body
-        className="min-h-full flex flex-col"
+        className="min-h-dvh flex flex-col"
         style={{ fontFamily: "var(--font-nunito), sans-serif" }}
       >
         {children}
